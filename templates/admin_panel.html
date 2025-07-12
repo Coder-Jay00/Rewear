@@ -1,20 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>ReWear - Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-
-<!-- Navbar (same as dashboard, with admin badge) -->
-
-
-<!-- Admin Dashboard -->
 <div class="container py-5">
   <h3 class="mb-4">Admin Dashboard</h3>
 
@@ -39,18 +24,9 @@
           <td>{{ user.email }}</td>
           <td>{{ user.registered_on.strftime('%Y-%m-%d') }}</td>
           <td>
-            {% if not user.is_blocked %}
-            <form method="post" action="{{ url_for('admin_block_user', user_id=user.id) }}" style="display:inline;">
-              {{ csrf_token() if csrf_token is defined }}
-              <button type="submit" class="btn btn-sm btn-danger">Block</button>
-            </form>
-            {% else %}
-            <span class="badge bg-secondary">Blocked</span>
-            {% endif %}
+            <a href="{{ url_for('admin_block_user', user_id=user.id) }}" class="btn btn-sm btn-danger">Block</a>
           </td>
         </tr>
-        {% else %}
-        <tr><td colspan="5" class="text-center text-muted">No users found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -74,19 +50,21 @@
         <tr>
           <td>{{ item.id }}</td>
           <td>{{ item.title }}</td>
-          <td>{{ item.uploader.name }}</td>
+          <td>{{ item.uploader.email }}</td>
           <td>
-            <span class="badge bg-{{ 'success' if item.status == 'active' else 'secondary' }}">{{ item.status.capitalize() }}</span>
+            <span class="badge {% if item.status == 'active' %}bg-success{% elif item.status == 'pending' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+              {{ item.status | capitalize }}
+            </span>
           </td>
           <td>
-            <form method="post" action="{{ url_for('admin_delete_item', item_id=item.id) }}" style="display:inline;">
-              {{ csrf_token() if csrf_token is defined }}
-              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-            </form>
+            {% if item.status == 'pending' %}
+              <a href="{{ url_for('admin.approve_item', item_id=item.id) }}" class="btn btn-sm btn-success">Approve</a>
+              <a href="{{ url_for('admin.reject_item', item_id=item.id) }}" class="btn btn-sm btn-danger">Reject</a>
+            {% else %}
+              <a href="{{ url_for('admin_delete_item', item_id=item.id) }}" class="btn btn-sm btn-outline-danger">Remove</a>
+            {% endif %}
           </td>
         </tr>
-        {% else %}
-        <tr><td colspan="5" class="text-center text-muted">No items found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -109,37 +87,22 @@
         {% for req in requests %}
         <tr>
           <td>{{ req.id }}</td>
-          <td>{{ req.item_title }}</td>
-          <td>{{ req.requester_email }}</td>
+          <td>{{ req.item.title }}</td>
+          <td>{{ req.from_user.email }}</td>
           <td>
-            <span class="badge bg-{{ 'warning text-dark' if req.status == 'pending' else 'success' if req.status == 'approved' else 'secondary' }}">{{ req.status.capitalize() }}</span>
+            <span class="badge {% if req.status == 'pending' %}bg-warning text-dark{% elif req.status == 'approved' %}bg-success{% else %}bg-secondary{% endif %}">
+              {{ req.status | capitalize }}
+            </span>
           </td>
           <td>
             {% if req.status == 'pending' %}
-            <form method="post" action="{{ url_for('admin_approve_request', request_id=req.id) }}" style="display:inline;">
-              {{ csrf_token() if csrf_token is defined }}
-              <button type="submit" class="btn btn-sm btn-success">Approve</button>
-            </form>
-            {% else %}
-            <span class="text-muted">-</span>
+              <a href="{{ url_for('admin.approve_request', request_id=req.id) }}" class="btn btn-sm btn-success">Approve</a>
             {% endif %}
           </td>
         </tr>
-        {% else %}
-        <tr><td colspan="5" class="text-center text-muted">No requests found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
-
-<!-- Footer -->
-<footer class="text-center p-4 bg-white shadow-sm mt-5">
-  <small>&copy; 2025 ReWear</small>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
-</html>
 {% endblock %}
