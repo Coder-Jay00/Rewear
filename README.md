@@ -1,6 +1,7 @@
 # Rewear
 Rewear Project for oddo hackathon 
 Statement 3 : ReWear – Community Clothing Exchange
+
 Team Leader : 
 Name : Jay Thakkar 
 Email : coderjt25@gmail.com
