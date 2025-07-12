@@ -12,27 +12,6 @@
 <body>
 
 <!-- Navbar (Admin style) -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand" href="{{ url_for('index') }}">ReWear</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('marketplace') }}">Marketplace</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('add_item') }}">List an Item</a></li>
-        <li class="nav-item">
-          <span class="badge bg-dark text-white ms-3">Admin Panel</span>
-        </li>
-        <li class="nav-item ms-3">
-          <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Logout</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
 
 <!-- Content -->
 <div class="container py-5">
