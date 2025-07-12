@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ReWear - Admin Swap Requests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Navbar (Admin style) -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">ReWear</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('marketplace') }}">Marketplace</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('add_item') }}">List an Item</a></li>
+        <li class="nav-item">
+          <span class="badge bg-dark text-white ms-3">Admin Panel</span>
+        </li>
+        <li class="nav-item ms-3">
+          <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Content -->
+<div class="container py-5">
+  <h3 class="mb-4">All Swap Requests (Admin)</h3>
+
+  {% if swap_requests %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Requested Item</th>
+          <th>Requested By</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Offered Item</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in swap_requests %}
+        <tr>
+          <td>{{ req.id }}</td>
+          <td>
+            {% set requested_item = items.get(req.item_id) %}
+            {% if requested_item %}
+              <a href="{{ url_for('item_detail', item_id=requested_item.id) }}">
+                {{ requested_item.title }}
+              </a>
+            {% else %}
+              <span class="text-muted">[Item not found]</span>
+            {% endif %}
+          </td>
+          <td>
+            {% set requester = users.get(req.requester_id) %}
+            {% if requester %}
+              {{ requester.name or requester.email }}
+            {% else %}
+              <span class="text-muted">[User not found]</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge bg-info text-dark">{{ req.type|capitalize }}</span>
+          </td>
+          <td>
+            {% if req.status == 'pending' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif req.status == 'approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif req.status == 'rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ req.status|capitalize }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if req.type == 'swap' %}
+              {% if req.offered_item_id %}
+                {% set offered_item = items.get(req.offered_item_id) %}
+                {% if offered_item %}
+                  <a href="{{ url_for('item_detail', item_id=offered_item.id) }}">
+                    {{ offered_item.title }} ({{ offered_item.size }}, {{ offered_item.condition }})
+                  </a>
+                {% else %}
+                  <span class="text-muted">[Offered item not found]</span>
+                {% endif %}
+              {% else %}
+                <span class="text-muted">[No item offered]</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">[Not applicable]</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('delete_swap_request', swap_id=req.id) }}" onsubmit="return confirm('Are you sure you want to delete this swap request?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="alert alert-warning text-center">No swap requests found.</div>
+  {% endif %}
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4 bg-white shadow-sm mt-5">
+  <small>&copy; 2025 ReWear</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+{% endblock %}

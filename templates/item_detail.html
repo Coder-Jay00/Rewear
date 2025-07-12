@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ReWear - Item Listing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">ReWear</a>
+    <div class="ms-auto">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Product Section -->
+<div class="container py-5">
+  <div class="row g-4">
+    <!-- Left: Image -->
+    <div class="col-md-6">
+      <img src="{% if item.image_filename %}{{ url_for('uploaded_file', filename=item.image_filename) }}{% else %}{{ url_for('static', filename='images/default.jpg') }}{% endif %}" class="img-fluid rounded shadow-sm" alt="{{ item.title }}">
+    </div>
+
+    <!-- Right: Details -->
+    <div class="col-md-6">
+      <h3 class="fw-bold">{{ item.title }}</h3>
+      <p><strong>Category:</strong> {{ item.category }}</p>
+      <p><strong>Size:</strong> {{ item.size }}</p>
+      <p><strong>Condition:</strong> {{ item.condition or "Good" }}</p>
+      <p>
+        <strong>Availability:</strong>
+        {% if item.status == 'approved' or item.status == 'available' %}
+          <span class="badge bg-success">Available</span>
+        {% else %}
+          <span class="badge bg-secondary">Not Available</span>
+        {% endif %}
+      </p>
+
+      <p class="mt-4">
+        <strong>Description:</strong><br>
+        {{ item.description or "No description provided." }}
+      </p>
+
+      <div class="d-flex gap-3 mt-4">
+        {% if current_user.is_authenticated and current_user.id != item.uploader_id %}
+          <form method="post" action="{{ url_for('swap_request', item_id=item.id) }}">
+    <input type="hidden" name="swap_type" value="swap">
+    <div class="mb-3">
+      <label for="offered_item_id" class="form-label">Select an item to offer in exchange:</label>
+      <select class="form-select" name="offered_item_id" id="offered_item_id" required>
+        <option value="" disabled selected>Select your item</option>
+        {% for my_item in my_items %}
+          <option value="{{ my_item.id }}">{{ my_item.title }} (Size: {{ my_item.size }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Request Exchange</button>
+</form>
+
+
+          <a href="mailto:{{ item.uploader.email }}" class="btn btn-outline-secondary">Contact Owner</a>
+        {% elif not current_user.is_authenticated %}
+          <a href="{{ url_for('login') }}" class="btn btn-primary">Login to Exchange</a>
+        {% else %}
+          <span class="text-muted">This is your item.</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4 bg-white shadow-sm mt-5">
+  <small>&copy; 2025 ReWear</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

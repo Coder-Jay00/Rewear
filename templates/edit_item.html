@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ReWear - Edit Item</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('index') }}">ReWear</a>
+    <div class="ms-auto">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Edit Item Form Section -->
+<div class="container py-5">
+  <h3 class="mb-4">Edit Clothing Item</h3>
+
+  {% if errors %}
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        {% for field, error_list in errors.items() %}
+          {% for error in error_list %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form action="{{ url_for('edit_item', item_id=item.id) }}" method="POST" enctype="multipart/form-data">
+    {{ csrf_token() if csrf_token is defined }}
+
+    <div class="mb-3">
+      <label for="itemImage" class="form-label">Upload New Image (optional)</label>
+      <input class="form-control" type="file" id="itemImage" name="itemImage">
+      {% if item.image_filename %}
+        <div class="mt-2">
+          <small>Current image:</small><br>
+          <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="Current Image" class="img-thumbnail" style="max-width: 150px;">
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title" name="title" value="{{ item.title }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select id="category" name="category" class="form-select" required>
+        <option value="">Select Category</option>
+        {% for cat in ['Men', 'Women', 'Kids', 'Winterwear'] %}
+          <option value="{{ cat }}" {% if item.category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="size" class="form-label">Size</label>
+      <select id="size" name="size" class="form-select" required>
+        <option value="">Select Size</option>
+        {% for sz in ['XS', 'S', 'M', 'L', 'XL', 'Free Size'] %}
+          <option value="{{ sz }}" {% if item.size == sz %}selected{% endif %}>{{ sz }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="condition" class="form-label">Condition</label>
+      <select id="condition" name="condition" class="form-select" required>
+        <option value="">Select Condition</option>
+        {% for cond in ['Brand New', 'Gently Used', 'Used'] %}
+          <option value="{{ cond }}" {% if item.condition == cond %}selected{% endif %}>{{ cond }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required>{{ item.description }}</textarea>
+    </div>
+
+    <div class="d-grid">
+      <button type="submit" class="btn btn-success">Save Changes</button>
+    </div>
+  </form>
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4 bg-white shadow-sm mt-5">
+  <small>&copy; 2025 ReWear</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

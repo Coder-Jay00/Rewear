@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Incoming Swap Requests</h2>
+<table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+        <th>Item</th>
+        <th>Requested By</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Offered Item (for Swap)</th>
+        <th>Action</th>
+    </tr>
+    {% for req in swap_requests %}
+    <tr>
+        <td>
+            {% if items[req.item_id] %}
+                <a href="{{ url_for('item_detail', item_id=items[req.item_id].id) }}">
+                    {{ items[req.item_id].title }}
+                </a>
+            {% else %}
+                [Requested item not found]
+            {% endif %}
+        </td>
+        <td>
+            {% if requesters[req.requester_id] %}
+                {{ requesters[req.requester_id].name or requesters[req.requester_id].email }}
+            {% else %}
+                [User not found]
+            {% endif %}
+        </td>
+        <td>{{ req.type|capitalize }}</td>
+        <td>{{ req.status|capitalize }}</td>
+        <td>
+            {% if req.type == 'swap' %}
+                {% if req.offered_item_id %}
+                    {% set offered_item = items.get(req.offered_item_id) %}
+                    {% if offered_item %}
+                        <a href="{{ url_for('item_detail', item_id=offered_item.id) }}">
+                            {{ offered_item.title }} ({{ offered_item.size }}, {{ offered_item.condition }})
+                        </a>
+                    {% else %}
+                        [Offered item not found]
+                    {% endif %}
+                {% else %}
+                    [No item offered]
+                {% endif %}
+            {% else %}
+                [Not applicable]
+            {% endif %}
+        </td>
+        <td>
+            {% if req.status == 'pending' %}
+                <form method="post" action="{{ url_for('handle_swap_request_action', swap_id=req.id) }}" style="display:inline;">
+                    <button type="submit" name="action" value="approve">Approve</button>
+                    <button type="submit" name="action" value="reject">Reject</button>
+                </form>
+            {% else %}
+                {{ req.status|capitalize }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% if not swap_requests %}
+<p>You have not received any swap or buy requests yet.</p>
+{% endif %}
+{% endblock %}

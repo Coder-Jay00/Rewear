@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ReWear - Add/Edit Item</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Navbar -->
+
+
+<!-- Item Form Section -->
+<div class="container py-5">
+  <h3 class="mb-4">{{ 'Edit' if item else 'Add' }} Clothing Item</h3>
+
+  {% if errors %}
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        {% for field, error_list in errors.items() %}
+          {% for error in error_list %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form action="{{ url_for('edit_item', item_id=item.id) if item else url_for('add_item') }}" method="POST" enctype="multipart/form-data">
+    {{ csrf_token() if csrf_token is defined }}
+
+    <div class="mb-3">
+      <label for="itemImage" class="form-label">Upload Image</label>
+      <input class="form-control" type="file" id="image" name="image">
+      {% if item and item.image_filename %}
+        <img src="{{ url_for('uploaded_file', filename=item.image_filename) }}" alt="Current Image" class="img-thumbnail mt-2" style="max-width: 150px;">
+      {% endif %}
+    </div>
+
+    <div class="mb-3">
+      <label for="itemTitle" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title" name="title" value="{{ item.title if item else '' }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="category" class="form-label">Category</label>
+      <select id="category" name="category" class="form-select" required>
+        <option value="">Select Category</option>
+        {% for cat in ['Men', 'Women', 'Kids', 'Winterwear'] %}
+          <option value="{{ cat }}" {% if item and item.category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+  <label for="tags" class="form-label">Tags (comma-separated)</label>
+  <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g. denim, winter, blue">
+</div>
+
+    <div class="mb-3">
+    <label for="type" class="form-label">Type</label>
+    <select id="type" name="type" class="form-select" required>
+      <option value="">Select Type</option>
+      <option value="swap">Branded</option>
+      <option value="donate">Local</option>
+    </select>
+  </div>
+
+    <div class="mb-3">
+      <label for="size" class="form-label">Size</label>
+      <select id="size" name="size" class="form-select" required>
+        <option value="">Select Size</option>
+        {% for sz in ['XS', 'S', 'M', 'L', 'XL', 'Free Size'] %}
+          <option value="{{ sz }}" {% if item and item.size == sz %}selected{% endif %}>{{ sz }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="condition" class="form-label">Condition</label>
+      <select id="condition" name="condition" class="form-select" required>
+        <option value="">Select Condition</option>
+        {% for cond in ['Brand New', 'Gently Used', 'Used'] %}
+          <option value="{{ cond }}" {% if item and item.condition == cond %}selected{% endif %}>{{ cond }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea id="description" name="description" class="form-control" rows="4" required>{{ item.description if item else '' }}</textarea>
+    </div>
+
+    <div class="d-grid">
+      <button type="submit" class="btn btn-success">Save Item</button>
+    </div>
+  </form>
+</div>
+
+<!-- Footer -->
+<footer class="text-center p-4 bg-white shadow-sm mt-5">
+  <small>&copy; 2025 ReWear</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+{% endblock %}

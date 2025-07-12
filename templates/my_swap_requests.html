@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-5">
+  <h3 class="mb-4">My Swap Requests</h3>
+
+  {% if swap_requests %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th>Item</th>
+          <th>Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in swap_requests %}
+        <tr>
+          <td>
+            {% set item = items[req.item_id] %}
+            {% if item %}
+              <a href="{{ url_for('item_detail', item_id=item.id) }}">{{ item.title }}</a>
+            {% else %}
+              <span class="text-muted">[Item not found]</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge bg-info text-dark">{{ req.type|capitalize }}</span>
+          </td>
+          <td>
+            {% if req.status == 'pending' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif req.status == 'approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif req.status == 'rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ req.status|capitalize }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="alert alert-info text-center">You have not made any swap or buy requests yet.</div>
+  {% endif %}
+</div>
+
+{% endblock %}
